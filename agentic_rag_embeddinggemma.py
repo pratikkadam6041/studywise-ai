@@ -7,7 +7,7 @@ from agno.vectordb.lancedb import LanceDb, SearchType
 
 # Page configuration
 st.set_page_config(
-    page_title="Agentic RAG with Google's EmbeddingGemma",
+    page_title="StudyWise AI",
     page_icon="🔥",
     layout="wide"
 )
@@ -16,7 +16,7 @@ st.set_page_config(
 def load_knowledge_base():
     knowledge_base = Knowledge(
         vector_db=LanceDb(
-            table_name="recipes",
+            table_name="studywise_documents",
             uri="tmp/lancedb",
             search_type=SearchType.vector,
             embedder=OllamaEmbedder(id="embeddinggemma:latest", dimensions=768),
@@ -87,7 +87,7 @@ with st.sidebar:
             st.markdown(f"{i}. {url}")
 
 # Main title and description
-st.title("🔥 Agentic RAG with EmbeddingGemma (100% local)")
+st.title("📚 StudyWise AI")
 st.markdown(
     """
 This app demonstrates an agentic RAG system using local models via [Ollama](https://ollama.com/):

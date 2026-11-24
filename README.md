@@ -18,7 +18,7 @@ Lecture notes, research papers, and course guides can be difficult to navigate w
 
 The current application accepts **PDF URLs**, creates a searchable knowledge base, and streams an answer in a browser interface. It is a starting point for an academic project on document retrieval, answer quality, and the practical limits of language models.
 
-## What works today
+## Current implementation
 
 - **PDF URL input:** Add a reachable PDF URL through the sidebar.
 - **Semantic retrieval:** Represent document content with EmbeddingGemma and search it using LanceDB.
@@ -149,11 +149,10 @@ studywise-ai/
 └── README.md
 ```
 
-The PDF URL list is held in the Streamlit session; vector data is written to `tmp/lancedb`. Avoid committing private documents, model files, virtual environments, or secrets.
+The PDF URL list is held in the Streamlit session; vector data is written to `tmp/lancedb` in the `studywise_documents` table. Earlier copies used a `recipes` table; its indexed PDFs are not automatically moved to the new table and must be added again. Avoid committing private documents, model files, virtual environments, or secrets.
 
 ## Credits and license
 
-The application code and interface images come from [Agentic RAG with EmbeddingGemma](https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/rag_tutorials/agentic_rag_embedding_gemma), part of [Shubhamsaboo/awesome-llm-apps](https://github.com/Shubhamsaboo/awesome-llm-apps), at source commit [`14c5f8ff0094659f321801385d2b52ccc65fea3b`](https://github.com/Shubhamsaboo/awesome-llm-apps/commit/14c5f8ff0094659f321801385d2b52ccc65fea3b). This repository adds project documentation, repository configuration, and a dependency adjustment. The application itself is the upstream baseline.
+The application code and interface images come from [Agentic RAG with EmbeddingGemma](https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/rag_tutorials/agentic_rag_embedding_gemma), part of [Shubhamsaboo/awesome-llm-apps](https://github.com/Shubhamsaboo/awesome-llm-apps), at source commit [`14c5f8ff0094659f321801385d2b52ccc65fea3b`](https://github.com/Shubhamsaboo/awesome-llm-apps/commit/14c5f8ff0094659f321801385d2b52ccc65fea3b). This repository adds project documentation, repository configuration, a dependency adjustment, and small naming changes. The application remains an adaptation of the upstream baseline.
 
 The upstream repository is distributed under the [Apache License 2.0](LICENSE). Model licenses and terms are separate; review them before use or redistribution.
-
