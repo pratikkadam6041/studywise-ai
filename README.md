@@ -1,92 +1,159 @@
-# StudyWise AI
+# 📚 StudyWise AI
 
-**Turn academic PDFs into a searchable study companion.**
+### Ask better questions of your study material.
 
-StudyWise AI is an early-stage Python application that lets you ask questions about documents. Add a PDF URL, wait for it to be indexed, and ask a question in the browser. The app retrieves relevant material and uses a locally running language model to prepare an answer.
+An early-stage, local-first document question-answering project using Python, retrieval-augmented generation, and open models.
 
-> **Project status:** This is a starting point for a fourth-year project. The application is adapted from an existing open-source example; the improvements in the roadmap below are ideas for future work, not completed features.
+[How it works](#how-it-works) · [Get started](#get-started) · [Roadmap](#roadmap) · [Credits](#credits-and-license)
+
+---
+
+> **Project status: Baseline.** StudyWise AI currently adapts an existing open-source RAG example. The application is the upstream starting point; the roadmap describes planned work, not completed features. See [Credits and license](#credits-and-license).
+
+> **Validation:** The Python dependencies were installed and required imports were checked. An end-to-end test with Ollama, both models, and a PDF remains to be completed.
+
+## The idea
+
+Lecture notes, research papers, and course guides can be difficult to navigate when you need one specific answer. StudyWise AI explores a simpler workflow: add a PDF source, ask a question, and use relevant document content to help a language model respond.
+
+The current application accepts **PDF URLs**, creates a searchable knowledge base, and streams an answer in a browser interface. It is a starting point for an academic project on document retrieval, answer quality, and the practical limits of language models.
+
+## What works today
+
+- **PDF URL input:** Add a reachable PDF URL through the sidebar.
+- **Semantic retrieval:** Represent document content with EmbeddingGemma and search it using LanceDB.
+- **Local model inference:** Use Llama 3.2 through Ollama to generate responses.
+- **Interactive interface:** Ask questions and view streamed answers in Streamlit.
+- **Local vector storage:** Store LanceDB data in `tmp/lancedb` relative to the working directory.
+
+The current app has **no local file upload, page-level citations, evaluation dashboard, or guarantee that answers are supported**. Those are candidates for future work. Inference and embeddings run locally after the models are available; fetching a PDF URL requires network access.
 
 ## How it works
 
-1. **Add a source:** Enter the URL of a PDF in the sidebar.
-2. **Build the knowledge base:** The app reads the document, creates embeddings with EmbeddingGemma, and stores them in LanceDB.
-3. **Ask a question:** Your question is matched to relevant content through vector search.
-4. **Explore the answer:** An Agno agent passes retrieved information to Llama 3.2 through Ollama and streams the response to the interface.
+StudyWise AI uses **retrieval-augmented generation (RAG)**: it searches for relevant document content and gives that context to a language model before it answers.
 
 ```text
-PDF URL → Document processing → EmbeddingGemma → LanceDB
-                                                  ↓
-Question → Search → Retrieved content → Llama 3.2 → Answer
+INDEXING
+PDF URL  →  Read and process document  →  EmbeddingGemma  →  LanceDB
+
+QUESTION ANSWERING
+Question  →  Search LanceDB  →  Relevant content  →  Llama 3.2  →  Answer
 ```
 
-This technique is called **retrieval-augmented generation (RAG)**. Model inference and embeddings run locally after the models have been downloaded; fetching PDF URLs requires network access. Answers can still be incorrect, so check important information against the original document.
+1. **Add a source.** Provide a PDF URL in the sidebar. The application adds its content to the knowledge base.
+2. **Create a searchable representation.** EmbeddingGemma converts text into numerical vectors stored in LanceDB.
+3. **Retrieve context.** When a question is asked, the agent searches the knowledge base for relevant information.
+4. **Generate an answer.** Llama 3.2, served by Ollama, generates a response for the Streamlit interface.
 
-## Technology
+Retrieval can miss important information, and the model can produce inaccurate answers. **Check important responses against the original document.**
+
+## Tech stack
 
 | Component | Role |
 | --- | --- |
-| Python and Streamlit | Application and browser interface |
-| Agno | Agent and knowledge-base orchestration |
-| Ollama | Local model runtime |
-| EmbeddingGemma | Text embeddings for search |
-| LanceDB | Local vector storage and retrieval |
-| Llama 3.2 | Answer generation |
+| **Python** | Application language |
+| **Streamlit** | Browser interface |
+| **Agno** | Agent and knowledge-base orchestration |
+| **Ollama** | Local model runtime |
+| **EmbeddingGemma** | Text embeddings for retrieval |
+| **LanceDB** | Vector storage and search |
+| **Llama 3.2** | Response generation |
+| **pypdf** | PDF processing dependency |
 
-## Get started on Windows
+## Get started
 
-You need Python 3.12, [Git](https://git-scm.com/downloads), and [Ollama for Windows](https://ollama.com/download/windows). The models and application need several gigabytes of disk space; the available memory and hardware affect speed. After installing Ollama, open a new PowerShell window.
+### Prerequisites
 
-Clone this repository, then enter its folder:
+- **Python 3.12** and Git.
+- [Ollama for Windows](https://ollama.com/download/windows), installed and running. Restart PowerShell after installation if the `ollama` command is not found.
+- Internet access to install dependencies, download the models, and retrieve a PDF URL.
+- Several gigabytes of free disk space. The default models together require roughly 2.6 GB, in addition to Ollama, Python packages, and document data. Performance depends on your computer.
+
+These steps use **Windows PowerShell**. Run each command separately and wait for it to finish.
+
+### 1. Download the project
 
 ```powershell
 git clone https://github.com/pratikkadam6041/studywise-ai.git
 cd studywise-ai
 ```
 
-Create a virtual environment and install dependencies:
+### 2. Set up Python dependencies
 
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-Download the models and start the application:
+If `py -3.12` cannot find Python, install a working Python 3.12 distribution and reopen PowerShell. The `openai` Python package is included because the tested Agno version required it during imports; this local Ollama workflow does not require an OpenAI API key.
+
+### 3. Download the models
 
 ```powershell
 ollama pull embeddinggemma:latest
 ollama pull llama3.2:latest
+```
+
+These are the model names used by the current code. Ollama must be running before you use the application.
+
+### 4. Start StudyWise AI
+
+```powershell
 .\.venv\Scripts\python.exe -m streamlit run agentic_rag_embeddinggemma.py
 ```
 
-Ollama must be running. Open the local address shown by Streamlit, add a publicly accessible PDF URL, and enter a question. The `openai` Python package is included because the currently installed Agno package requires it for an import; using this app with Ollama does not require an OpenAI API key.
+Open the local URL printed by Streamlit, normally `http://localhost:8501`. Add a reachable PDF URL in the sidebar, wait for processing, and enter a question.
 
-## Example questions
+### Try asking
 
-- What are the main ideas in this lecture?
-- Explain the difference between the two methods described in the paper.
-- What assumptions does the author make?
+> “What are the main ideas in this document?”
+
+> “How does the author compare the two approaches?”
+
+> “What assumptions or limitations are described?”
+
+## Troubleshooting
+
+| Problem | What to check |
+| --- | --- |
+| `requirements.txt` not found | Run `cd studywise-ai` first, then retry the installation command. |
+| `ollama` is not recognized | Install Ollama and open a new PowerShell window. |
+| A model is missing | Run the two `ollama pull` commands above and wait for each download to finish. |
+| Python 3.12 cannot be found | Install or repair Python 3.12, then confirm `py -3.12 --version` works. |
+| The PDF cannot be loaded | Check that the URL is reachable and points to a PDF. Image-only scans may not provide usable text. |
+| An answer looks wrong | Compare it with the source; the baseline does not verify claims or provide reliable page citations. |
 
 ## Roadmap
 
-These are possible future additions; they are **not implemented yet**:
+The next stage is to turn the baseline into a more useful and measurable student project:
 
-- Upload local PDFs and manage multiple documents.
-- Show citations with document names and page numbers.
-- Generate revision notes and practice quizzes.
-- Evaluate answer correctness and compare retrieval methods.
-- Improve handling of scanned PDFs and unanswerable questions.
+1. **Document management:** Add local PDF uploads and controls for multiple documents.
+2. **Trustworthy references:** Attach document names, page numbers, and supporting passages to answers.
+3. **Evidence-aware responses:** Handle missing information and unanswerable questions more clearly.
+4. **Evaluation:** Build a question set and measure retrieval success, answer correctness, citation accuracy, and response time.
+5. **Study tools:** Explore source-based summaries and practice quizzes after the core workflow is reliable.
 
-## Project files
+These are proposed improvements. No accuracy, speed, or other benchmark results are claimed yet.
+
+## Project structure
 
 ```text
-agentic_rag_embeddinggemma.py  Streamlit application
-requirements.txt               Python dependencies
-agno.png, google.png, ollama.png  Interface images
-LICENSE                        Upstream Apache 2.0 license
+studywise-ai/
+├── agentic_rag_embeddinggemma.py  # Streamlit app and RAG workflow
+├── requirements.txt               # Python dependencies
+├── agno.png                       # Interface asset
+├── google.png                     # Interface asset
+├── ollama.png                     # Interface asset
+├── .gitignore                     # Local files excluded from Git
+├── LICENSE                        # Apache License 2.0
+└── README.md
 ```
 
-Local vector data is written under `tmp/lancedb`. Avoid committing private documents, downloaded models, environment files, or the virtual environment.
+The PDF URL list is held in the Streamlit session; vector data is written to `tmp/lancedb`. Avoid committing private documents, model files, virtual environments, or secrets.
 
-## Acknowledgements and license
+## Credits and license
 
-This project starts from [Agentic RAG with EmbeddingGemma](https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/rag_tutorials/agentic_rag_embedding_gemma) in [Shubhamsaboo/awesome-llm-apps](https://github.com/Shubhamsaboo/awesome-llm-apps), source commit `14c5f8ff0094659f321801385d2b52ccc65fea3b`. The application code and images originate from that project. This copy adds a new README, repository configuration, and an additional dependency required by the installed Agno version. The upstream project is distributed under the [Apache License 2.0](LICENSE); retain its license and attribution when redistributing or modifying this copy. Model licenses and terms are separate.
+The application code and interface images come from [Agentic RAG with EmbeddingGemma](https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/rag_tutorials/agentic_rag_embedding_gemma), part of [Shubhamsaboo/awesome-llm-apps](https://github.com/Shubhamsaboo/awesome-llm-apps), at source commit [`14c5f8ff0094659f321801385d2b52ccc65fea3b`](https://github.com/Shubhamsaboo/awesome-llm-apps/commit/14c5f8ff0094659f321801385d2b52ccc65fea3b). This repository adds project documentation, repository configuration, and a dependency adjustment. The application itself is the upstream baseline.
+
+The upstream repository is distributed under the [Apache License 2.0](LICENSE). Model licenses and terms are separate; review them before use or redistribution.
+
