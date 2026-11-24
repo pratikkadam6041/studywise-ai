@@ -90,4 +90,3 @@ Local vector data is written under `tmp/lancedb`. Avoid committing private docum
 ## Acknowledgements and license
 
 This project starts from [Agentic RAG with EmbeddingGemma](https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/rag_tutorials/agentic_rag_embedding_gemma) in [Shubhamsaboo/awesome-llm-apps](https://github.com/Shubhamsaboo/awesome-llm-apps), source commit `14c5f8ff0094659f321801385d2b52ccc65fea3b`. The application code and images originate from that project. This copy adds a new README, repository configuration, and an additional dependency required by the installed Agno version. The upstream project is distributed under the [Apache License 2.0](LICENSE); retain its license and attribution when redistributing or modifying this copy. Model licenses and terms are separate.
-
